@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Найти собеседника — сервис поддержки и наставничества</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --bg-card: #ffffff;
+      --accent: #6261ff;
+      --accent-soft: #e4e6ff;
+      --accent-dark: #3d3cc7;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --danger: #ef4444;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
+      --shadow-light: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #e9efff 0, #f4f6fb 40%, #ffffff 100%);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin-inline: -16px;
+      background: linear-gradient(to bottom, rgba(244, 246, 251, 0.96), rgba(244, 246, 251, 0.75), transparent);
+      z-index: -1;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 20% 20%, #ffffff 0, #c4cbff 40%, #6261ff 100%);
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      border-style: dashed;
+    }
+
+    .logo-text-main {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.1s;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .nav-link.primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.6);
+      font-weight: 500;
+    }
+
+    .nav-link.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    /* Hero */
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: center;
+      padding: 12px 0 24px;
+    }
+
+    .hero-kicker {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .hero-kicker-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.25);
+    }
+
+    .hero-title {
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 440px;
+      margin-bottom: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      border-radius: 999px;
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #ffffff;
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.7);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .btn-outline:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-meta-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px dashed rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 220px;
+    }
+
+    .hero-card {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #ffffff 0, #dde2ff 40%, #f4f6fb 100%);
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .hero-card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .hero-card-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(129, 140, 248, 0.18);
+      color: #4f46e5;
+    }
+
+    .hero-avatars {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .hero-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      border: 2px solid #f5f5ff;
+    }
+
+    .hero-avatar:nth-child(2) { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .hero-avatar:nth-child(3) { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+
+    .hero-card-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .hero-mini-card {
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-light);
+      font-size: 11px;
+    }
+
+    .hero-mini-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .hero-mini-meta {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .hero-floating {
+      position: absolute;
+      bottom: -12px;
+      right: -4px;
+      font-size: 11px;
+      background: #111827;
+      color: #f9fafb;
+      padding: 8px 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.6);
+    }
+
+    .hero-floating-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    /* Sections */
+
+    section {
+      margin-top: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 320px;
+    }
+
+    /* Mentors */
+
+    .mentors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .mentor-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-light);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .mentor-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+    }
+
+    .mentor-top {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mentor-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #f97316, #fb7185);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .mentor-info-main {
+      flex: 1;
+    }
+
+    .mentor-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .mentor-role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mentor-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #4338ca;
+      align-self: flex-start;
+    }
+
+    .mentor-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      min-height: 34px;
+    }
+
+    .mentor-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      gap: 8px;
+    }
+
+    .mentor-price {
+      font-weight: 600;
+      color: var(--accent-dark);
+      font-size: 13px;
+    }
+
+    .mentor-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-chip {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(239, 246, 255, 0.95);
+      color: #1d4ed8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-chip:hover {
+      background: #dbeafe;
+      transform: translateY(-1px);
+    }
+
+    /* Categories */
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .category-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-light);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.15s ease;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .category-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+      background: linear-gradient(135deg, #eef2ff, #fdfdfd);
+    }
+
+    .category-title {
+      font-weight: 600;
+    }
+
+    .category-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Form */
+
+    .form-wrapper {
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 24px;
+      padding: 18px 18px 20px;
+      box-shadow: var(--shadow-soft);
+      max-width: 520px;
+    }
+
+    .form-row {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(248, 250, 252, 0.9);
+      font: inherit;
+      font-size: 14px;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+      resize: vertical;
+      min-height: 40px;
+    }
+
+    textarea {
+      min-height: 80px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
+      background: #ffffff;
+    }
+
+    .helper {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .status-message {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-message.success {
+      color: #16a34a;
+    }
+
+    .status-message.error {
+      color: var(--danger);
+    }
+
+    /* Footer */
+
+    footer {
+      margin-top: auto;
+      padding: 18px 16px 26px;
+      font-size: 12px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      cursor: pointer;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal (Mentor profile) */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      padding: 16px;
+    }
+
+    .modal {
+      background: #f9fafb;
+      border-radius: 24px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.55);
+      padding: 18px 18px 16px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      font-size: 14px;
+    }
+
+    .modal-top {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .modal-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .modal-role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .modal-price {
+      margin-top: 4px;
+      font-weight: 600;
+      color: var(--accent-dark);
+      font-size: 13px;
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .modal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .modal-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(226, 232, 240, 0.9);
+      color: #4b5563;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-wa {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .btn-wa:hover {
+      background: #16a34a;
+    }
+
+    .btn-tg {
+      background: #0ea5e9;
+      color: #ffffff;
+    }
+
+    .btn-tg:hover {
+      background: #0284c7;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.1fr);
+      }
+      .hero-visual {
+        order: -1;
+        min-height: 190px;
+      }
+      header {
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mentors-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .categories-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .page {
+        padding-inline: 14px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .mentors-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .categories-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      nav {
+        justify-content: flex-start;
+      }
+      .hero {
+        padding-top: 6px;
+      }
+      .form-wrapper {
+        padding: 16px 14px 18px;
+      }
+      .modal {
+        padding: 16px 14px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <div>
+          <div class="logo-text-main">Собеседник</div>
+          <div class="logo-text-sub">поддержка, наставничество, внимание</div>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-link" data-scroll="#mentors">Менторы</button>
+        <button class="nav-link" data-scroll="#categories">Категории</button>
+        <button class="nav-link" data-scroll="#form">Форма заявки</button>
+        <button class="nav-link primary" data-scroll="#mentors">Найти собеседника</button>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <main>
+      <section class="hero" id="home">
+        <div>
+          <div class="hero-kicker">
+            <span class="hero-kicker-dot"></span>
+            <span>Всегда найдётся тот, кто выслушает</span>
+          </div>
+          <h1 class="hero-title">
+            Сервис, где можно найти собеседника, наставника или учителя — по одному клику.
+          </h1>
+          <p class="hero-subtitle">
+            Мы соединяем людей, которым важно быть услышанными, с теми, кто готов делиться опытом, поддержкой и знаниями.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-scroll="#mentors">
+              Найти собеседника
+            </button>
+            <button class="btn btn-outline" data-scroll="#form">
+              Стать ментором
+            </button>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-meta-badge">6–12 проверенных менторов на старте</div>
+            <div>Формат: диалог, наставничество, обучение или просто тёплая беседа.</div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="hero-card-header">
+              <div>
+                <div class="hero-card-title">Сеансы сегодня</div>
+                <div class="hero-mini-meta">онлайн и анонимно, если нужно</div>
+              </div>
+              <div class="hero-card-pill">люди говорят — их слышат</div>
+            </div>
+            <div class="hero-avatars">
+              <div class="hero-avatar"></div>
+              <div class="hero-avatar"></div>
+              <div class="hero-avatar"></div>
+            </div>
+            <div style="margin: 10px 0 8px; font-size: 12px; color: var(--muted);">
+              Кто-то ищет наставника по карьере, кто-то — человека, с которым можно поговорить по душам.
+            </div>
+            <div class="hero-card-row">
+              <div class="hero-mini-card">
+                <div class="hero-mini-title">“Поговорить по душам”</div>
+                <div class="hero-mini-meta">поддержка, когда сложно одному</div>
+              </div>
+              <div class="hero-mini-card">
+                <div class="hero-mini-title">“Наставник”</div>
+                <div class="hero-mini-meta">карьера, бизнес, навыки</div>
+              </div>
+            </div>
+            <div class="hero-floating">
+              <span class="hero-floating-dot"></span>
+              <span>Кто-то прямо сейчас выбирает собеседника</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mentors -->
+      <section id="mentors">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Наши менторы и собеседники</div>
+            <div class="section-subtitle">
+              На старте — небольшой, но понятный список людей, к которым можно обратиться: поговорить по душам, получить совет или научиться новому.
+            </div>
+          </div>
+          <button class="btn btn-outline" data-scroll="#form">Стать ментором</button>
+        </div>
+
+        <div class="mentors-grid" id="mentorsGrid">
+          <!-- Карточки менторов создаются JS -->
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section id="categories">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Категории общения</div>
+            <div class="section-subtitle">
+              Выберите формат, который откликается именно вам. Затем — ментор, удобный мессенджер и время.
+            </div>
+          </div>
+        </div>
+        <div class="categories-grid">
+          <div class="category-card" data-scroll="#form">
+            <div class="category-title">Поговорить по душам</div>
+            <div class="category-desc">
+              Когда хочется, чтобы просто выслушали и поддержали без критики и оценок.
+            </div>
+          </div>
+          <div class="category-card" data-scroll="#form">
+            <div class="category-title">Наставник</div>
+            <div class="category-desc">
+              Поддержка в карьере, бизнесе, выборе пути, прокачка навыков через опыт других.
+            </div>
+          </div>
+          <div class="category-card" data-scroll="#form">
+            <div class="category-title">Учитель</div>
+            <div class="category-desc">
+              Помощь с учебой, языками, IT, творчеством и другими навыками в формате диалога.
+            </div>
+          </div>
+          <div class="category-card" data-scroll="#form">
+            <div class="category-title">Советчик</div>
+            <div class="category-desc">
+              Когда нужно трезвое мнение со стороны, разбор ситуации и возможных решений.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form -->
+      <section id="form">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Форма заявки</div>
+            <div class="section-subtitle">
+              Расскажите немного о себе и теме разговора. Мы подберём собеседника или ментора и свяжем вас через удобный мессенджер.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-wrapper">
+          <form id="requestForm">
+            <div class="form-row">
+              <label for="name">Имя</label>
+              <input type="text" id="name" name="name" placeholder="Например, Алия" required />
+            </div>
+            <div class="form-row">
+              <label for="age">Возраст</label>
+              <input type="number" id="age" name="age" placeholder="Например, 28" min="10" max="100" />
+              <div class="helper">Возраст поможет подобрать подходящего собеседника.</div>
+            </div>
+            <div class="form-row">
+              <label for="topic">Тема разговора</label>
+              <textarea id="topic" name="topic" placeholder="Коротко опишите, о чём хотите поговорить или какую поддержку получить" required></textarea>
+            </div>
+            <div class="form-row">
+              <label for="messenger">Удобный мессенджер</label>
+              <select id="messenger" name="messenger" required>
+                <option value="">Выберите вариант</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Telegram">Telegram</option>
+              </select>
+              <div class="helper">На выбранный мессенджер мы отправим контакт менторa/собеседника.</div>
+            </div>
+            <div class="form-footer">
+              <button type="submit" class="btn btn-primary">Отправить заявку</button>
+              <div id="formStatus" class="status-message">
+                Данные пока никуда не отправляются — демо-версия.
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div>© <span id="year"></span> Сервис «Собеседник». Первая версия.</div>
+      <div class="footer-links">
+        <span class="footer-link" data-scroll="#home">Главная</span>
+        <span class="footer-link" data-scroll="#mentors">Менторы</span>
+        <span class="footer-link" data-scroll="#categories">Категории</span>
+        <span class="footer-link" data-scroll="#form">Заявка</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal (mentor profile) -->
+  <div class="modal-backdrop" id="mentorModalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title" id="modalName"></div>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Закрыть окно">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-top">
+          <div class="modal-avatar" id="modalAvatar"></div>
+          <div>
+            <div class="modal-role" id="modalRole"></div>
+            <div class="modal-price" id="modalPrice"></div>
+          </div>
+        </div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div class="modal-tags" id="modalTags"></div>
+        <div class="modal-actions">
+          <button class="btn btn-wa" id="modalWhatsApp">Написать в WhatsApp</button>
+          <button class="btn btn-tg" id="modalTelegram">Написать в Telegram</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Демо-данные менторов
+    const mentors = [
+      {
+        id: 1,
+        name: "Айжан",
+        role: "Поговорить по душам",
+        desc: "Помогаю выговориться, прожить сложные эмоции и мягко найти опору в себе.",
+        price: "5 000 ₸ / сессия",
+        tags: ["поддержка", "эмоции", "самочувствие"],
+        wa: "https://wa.me/77000000001",
+        tg: "https://t.me/example1"
+      },
+      {
+        id: 2,
+        name: "Руслан",
+        role: "Наставник по карьере",
+        desc: "10+ лет в IT. Помогаю распутать карьерные развилки и не сгореть на работе.",
+        price: "7 000 ₸ / сессия",
+        tags: ["карьера", "IT", "выбор пути"],
+        wa: "https://wa.me/77000000002",
+        tg: "https://t.me/example2"
+      },
+      {
+        id: 3,
+        name: "Ерке",
+        role: "Учитель по языкам",
+        desc: "Практика английского и казахского без стресса — живые разговоры и поддержка.",
+        price: "4 500 ₸ / сессия",
+        tags: ["английский", "казахский", "практика речи"],
+        wa: "https://wa.me/77000000003",
+        tg: "https://t.me/example3"
+      },
+      {
+        id: 4,
+        name: "Мадина",
+        role: "Советчик по жизни",
+        desc: "Помогаю трезво посмотреть на ситуацию и увидеть несколько вариантов решений.",
+        price: "5 000 ₸ / сессия",
+        tags: ["жизненные ситуации", "отношения", "выбор"],
+        wa: "https://wa.me/77000000004",
+        tg: "https://t.me/example4"
+      },
+      {
+        id: 5,
+        name: "Данияр",
+        role: "Наставник по бизнесу",
+        desc: "Разбор идей, гипотез, первых шагов и ошибок на старте собственного дела.",
+        price: "9 000 ₸ / сессия",
+        tags: ["бизнес", "стартап", "финансы"],
+        wa: "https://wa.me/77000000005",
+        tg: "https://t.me/example5"
+      },
+      {
+        id: 6,
+        name: "Сауле",
+        role: "Поговорить по душам",
+        desc: "Если накопилось и не с кем поделиться — здесь можно просто быть собой.",
+        price: "4 000 ₸ / сессия",
+        tags: ["выгорание", "одиночество", "поддержка"],
+        wa: "https://wa.me/77000000006",
+        tg: "https://t.me/example6"
+      }
+    ];
+
+    // Отрисовка карточек менторов
+    const mentorsGrid = document.getElementById("mentorsGrid");
+    function renderMentors() {
+      mentorsGrid.innerHTML = "";
+      mentors.forEach((mentor) => {
+        const card = document.createElement("article");
+        card.className = "mentor-card";
+        card.dataset.id = mentor.id;
+        card.innerHTML = `
+          <div class="mentor-top">
+            <div class="mentor-avatar">${mentor.name.charAt(0)}</div>
+            <div class="mentor-info-main">
+              <div class="mentor-name">${mentor.name}</div>
+              <div class="mentor-role">${mentor.role}</div>
+            </div>
+            <div class="mentor-badge">онлайн</div>
+          </div>
+          <div class="mentor-desc">${mentor.desc}</div>
+          <div class="mentor-meta">
+            <div class="mentor-price">${mentor.price}</div>
+            <div>~ 45–60 мин</div>
+          </div>
+          <div class="mentor-actions">
+            <button class="btn-chip mentor-profile-btn" data-id="${mentor.id}">
+              Профиль
+            </button>
+            <button class="btn-chip" onclick="event.stopPropagation(); window.open('${mentor.wa}', '_blank')">
+              WhatsApp
+            </button>
+            <button class="btn-chip" onclick="event.stopPropagation(); window.open('${mentor.tg}', '_blank')">
+              Telegram
+            </button>
+          </div>
+        `;
+        mentorsGrid.appendChild(card);
+      });
+    }
+    renderMentors();
+
+    // Плавный скролл по data-scroll
+    function smoothScrollTo(target) {
+      const el = document.querySelector(target);
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+
+    document.addEventListener("click", (e) => {
+      const scrollBtn = e.target.closest("[data-scroll]");
+      if (scrollBtn) {
+        const target = scrollBtn.getAttribute("data-scroll");
+        smoothScrollTo(target);
+      }
+    });
+
+    // Модальное окно профиля ментора
+    const modalBackdrop = document.getElementById("mentorModalBackdrop");
+    const modalName = document.getElementById("modalName");
+    const modalAvatar = document.getElementById("modalAvatar");
+    const modalRole = document.getElementById("modalRole");
+    const modalPrice = document.getElementById("modalPrice");
+    const modalDesc = document.getElementById("modalDesc");
+    const modalTags = document.getElementById("modalTags");
+    const modalWhatsApp = document.getElementById("modalWhatsApp");
+    const modalTelegram = document.getElementById("modalTelegram");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+
+    function openMentorModal(id) {
+      const mentor = mentors.find((m) => m.id === Number(id));
+      if (!mentor) return;
+      modalName.textContent = mentor.name;
+      modalAvatar.textContent = mentor.name.charAt(0);
+      modalRole.textContent = mentor.role;
+      modalPrice.textContent = mentor.price;
+      modalDesc.textContent = mentor.desc;
+      modalTags.innerHTML = "";
+      mentor.tags.forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "modal-tag";
+        span.textContent = tag;
+        modalTags.appendChild(span);
+      });
+      modalWhatsApp.onclick = () => window.open(mentor.wa, "_blank");
+      modalTelegram.onclick = () => window.open(mentor.tg, "_blank");
+      modalBackdrop.style.display = "flex";
+    }
+
+    function closeMentorModal() {
+      modalBackdrop.style.display = "none";
+    }
+
+    mentorsGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".mentor-profile-btn");
+      if (btn) {
+        const id = btn.dataset.id;
+        openMentorModal(id);
+      }
+    });
+
+    modalCloseBtn.addEventListener("click", closeMentorModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) {
+        closeMentorModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMentorModal();
+    });
+
+    // Форма заявки (пока только имитация отправки)
+    const requestForm = document.getElementById("requestForm");
+    const formStatus = document.getElementById("formStatus");
+
+    requestForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      formStatus.textContent = "Отправка...";
+      formStatus.className = "status-message";
+      setTimeout(() => {
+        formStatus.textContent = "Заявка отправлена (демо). В реальной версии здесь будет интеграция с Email/ботом.";
+        formStatus.className = "status-message success";
+        requestForm.reset();
+      }, 800);
+    });
+
+    // Год в футере
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
